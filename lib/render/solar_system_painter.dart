@@ -1,6 +1,7 @@
 // render/solar_system_painter.dart
 
 import 'package:flutter/material.dart';
+import 'dart:math' as math;
 import '../simulation/celestial_body.dart';
 import 'camera.dart';
 
@@ -28,6 +29,19 @@ class SolarSystemPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
 
+    final starPaint = Paint()..color = Colors.white;
+
+    for (int i = 0; i < 200; i++) {
+      final dx = (i * 97) % size.width;
+      final dy = (i * 53) % size.height;
+
+      canvas.drawCircle(
+        Offset(dx, dy),
+        1,
+        starPaint,
+      );
+    }
+
     void drawBody(CelestialBody body) {
 
       final world = Offset(body.position.x, body.position.y);
@@ -41,13 +55,27 @@ class SolarSystemPainter extends CustomPainter {
         );
         final parentScreen = camera.worldToScreen(parentWorld) + screenCenter;
 
-        canvas.drawCircle(
-          parentScreen,
-          body.orbitRadius * camera.zoom,
-          orbitPaint,
-        );
-      } // endif
+        // órbitas pontilhadas
+        const segments = 90;
 
+        for (int i = 0; i < segments; i++) {
+
+          final angle1 = (i / segments) * 2 * math.pi;
+          final angle2 = ((i + 0.5) / segments) * 2 * math.pi;
+
+          final p1 = Offset(
+            parentScreen.dx + math.cos(angle1) * body.orbitRadius * camera.zoom,
+            parentScreen.dy + math.sin(angle1) * body.orbitRadius * camera.zoom,
+          );
+
+          final p2 = Offset(
+            parentScreen.dx + math.cos(angle2) * body.orbitRadius * camera.zoom,
+            parentScreen.dy + math.sin(angle2) * body.orbitRadius * camera.zoom,
+          );
+
+          canvas.drawLine(p1, p2, orbitPaint);
+        }
+      }
       // COR DO CORPO
       switch (body.name) {
         case "Sun":
@@ -83,6 +111,9 @@ class SolarSystemPainter extends CustomPainter {
         case "Callisto":
           planetPaint.color = Colors.grey.shade600;
           break;
+        case "Saturn":
+          planetPaint.color = Colors.grey;
+          break;
         default:
           planetPaint.color = Colors.white;
       }
@@ -102,6 +133,20 @@ class SolarSystemPainter extends CustomPainter {
         body.radius * camera.zoom,
         planetPaint,
       );
+
+      if (body.name == "Saturn") {
+        // Anéis para saturno
+        final ringPaint = Paint()
+          ..color = Colors.brown.withOpacity(0.6)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 3;
+
+        canvas.drawCircle(
+          screen,
+          body.radius * camera.zoom * 1.8,
+          ringPaint,
+        );
+      }
 
       // DESENHAR FILHOS (Luas)
       for (final child in body.children) {

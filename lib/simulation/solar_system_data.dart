@@ -89,8 +89,16 @@ class SolarSystemData {
       parent: jupiter,
     );
 
+    final saturn = CelestialBody(
+      name: "Saturno",
+      radius: 12,
+      orbitRadius: 500,
+      orbitSpeed: 0.003,
+      parent: sun,
+    );
+
     // Montar a hierarquia
-    sun.children.addAll([mercury,venus,earth,mars,jupiter]);
+    sun.children.addAll([mercury,venus,earth,mars,jupiter,saturn]);
     earth.children.add(moon);
     jupiter.children.addAll([io,europa,ganymede,callisto]);
 
