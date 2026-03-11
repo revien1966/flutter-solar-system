@@ -1,6 +1,6 @@
 😄 **plano de próximas etapas organizado** 
 
-para o projeto do Sistema Solar em Flutter, baseado no estado atual do GitHub (`https://github.com/revien1966/flutter-solar-system/`).
+para o projeto do Sistema Solar em Flutter, baseado no estado atual do GitHub.
 
 ---
 
