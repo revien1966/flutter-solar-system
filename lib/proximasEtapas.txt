@@ -1,0 +1,67 @@
+😄 **plano de próximas etapas organizado** 
+
+para o projeto do Sistema Solar em Flutter, baseado no estado atual do GitHub (`https://github.com/revien1966/flutter-solar-system/`).
+
+---
+
+# 🚀 Plano de Próximas Etapas — Sistema Solar Flutter
+
+## 1️⃣ Melhorar interação e clique em corpos pequenos
+
+* Implementar **magnetismo de clique**: selecionar o corpo mais próximo do cursor, mesmo se não estiver dentro do raio.
+* Ajustar **click padding individual por tipo de corpo** (planetas maiores vs luas pequenas).
+* Possível: mostrar **hover ou destaque visual** quando o mouse passa sobre um corpo (desktop).
+
+## 2️⃣ Zoom, pan e foco aprimorados
+
+* Ajustar **suavização da câmera** para movimentos mais naturais.
+* Criar **botão ou gesto de “foco rápido”** para centrar o corpo selecionado.
+* Limitar ou suavizar zoom máximo/mínimo para evitar corpos “miniatura” muito difíceis de clicar.
+
+## 3️⃣ Expansão do sistema solar
+
+* Adicionar **planetas exteriores**: Saturno, Urano, Netuno.
+* Incluir **principais luas** de cada planeta.
+* Organizar em **hierarquia pai/filho** para facilitar renderização e hit test.
+
+## 4️⃣ Painel de informações avançado
+
+* Adicionar novos atributos: **massa, período orbital, distância real do Sol, composição**.
+* Permitir **scroll ou tabs** se muitas luas forem selecionadas.
+* Melhorar estilo visual: cores, ícones ou gráficos simples.
+
+## 5️⃣ Renderização e performance
+
+* Ajustar **velocidade de órbitas** para que seja visualmente agradável.
+* Possível: adicionar **trails ou efeitos de movimento** para planetas e luas.
+* Checar performance ao aumentar número de corpos.
+
+## 6️⃣ Organização de projeto / Git
+
+* Criar **branches por funcionalidade**:
+
+  * `feature/magnetismo-clique`
+  * `feature/novos-planetas`
+  * `feature/painel-avancado`
+* Fazer commits claros e pequenos:
+
+  * `"Adiciona Titan como lua de Saturno"`
+  * `"Implementa magnetismo de clique para luas pequenas"`
+
+## 7️⃣ Extras opcionais (avançado)
+
+* Zoom contínuo com **Scroll Wheel e Pinch** mais natural.
+* Tela de info detalhada com **gráficos simples** (ex: órbita vs tempo).
+* Possível: animação de **dias/anos acelerados** para ver órbitas completas.
+
+---
+
+💡 **Resumo de prioridade para retorno imediato:**
+
+1. Melhorar clique em corpos pequenos (magnetismo + padding).
+2. Suavizar foco automático da câmera.
+3. Expandir sistema solar com mais planetas e luas.
+
+Depois disso, evoluir o painel de informações e visualizações avançadas.
+
+
