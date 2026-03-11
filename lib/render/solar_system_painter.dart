@@ -6,7 +6,6 @@ import '../simulation/celestial_body.dart';
 import 'camera.dart';
 
 class SolarSystemPainter extends CustomPainter {
-
   final List<CelestialBody> bodies;
   final Camera camera;
   final CelestialBody? hovered;
@@ -21,7 +20,6 @@ class SolarSystemPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-
     final screenCenter = Offset(size.width / 2, size.height / 2);
     final planetPaint = Paint();
     final orbitPaint = Paint()
@@ -43,23 +41,17 @@ class SolarSystemPainter extends CustomPainter {
     }
 
     void drawBody(CelestialBody body) {
-
       final world = Offset(body.position.x, body.position.y);
       final screen = camera.worldToScreen(world) + screenCenter;
 
       // DESENHAR ÓRBITA
       if (body.parent != null) {
-        final parentWorld = Offset(
-          body.parent!.position.x,
-          body.parent!.position.y,
-        );
+        final parentWorld = Offset(body.parent!.position.x, body.parent!.position.y, );
         final parentScreen = camera.worldToScreen(parentWorld) + screenCenter;
 
         // órbitas pontilhadas
         const segments = 90;
-
         for (int i = 0; i < segments; i++) {
-
           final angle1 = (i / segments) * 2 * math.pi;
           final angle2 = ((i + 0.5) / segments) * 2 * math.pi;
 
@@ -76,76 +68,58 @@ class SolarSystemPainter extends CustomPainter {
           canvas.drawLine(p1, p2, orbitPaint);
         }
       }
+
       // COR DO CORPO
       switch (body.name) {
-        case "Sun":
-          planetPaint.color = Colors.orange;
-          break;
-        case "Mercury":
-          planetPaint.color = Colors.grey;
-          break;
-        case "Venus":
-          planetPaint.color = Colors.yellowAccent;
-          break;
-        case "Earth":
-          planetPaint.color = Colors.blue;
-          break;
-        case "Moon":
-          planetPaint.color = Colors.grey.shade300;
-          break;
-        case "Mars":
-          planetPaint.color = Colors.redAccent;
-          break;
-        case "Jupiter":
-          planetPaint.color = Colors.brown;
-          break;
-        case "Io":
-          planetPaint.color = Colors.orangeAccent;
-          break;
-        case "Europa":
-          planetPaint.color = Colors.white70;
-          break;
-        case "Ganymede":
-          planetPaint.color = Colors.grey;
-          break;
-        case "Callisto":
-          planetPaint.color = Colors.grey.shade600;
-          break;
-        case "Saturn":
-          planetPaint.color = Colors.grey;
-          break;
-        default:
-          planetPaint.color = Colors.white;
+        case "Sun"     : planetPaint.color = Colors.orange; break;
+        case "Mercury" : planetPaint.color = Colors.grey;   break;
+        case "Venus"   : planetPaint.color = Colors.yellowAccent; break;
+        case "Earth"   : planetPaint.color = Colors.blue;         break;
+        case "Moon"    : planetPaint.color = Colors.grey.shade300; break;
+        case "Mars"    : planetPaint.color = Colors.redAccent;     break;
+        case "Jupiter" : planetPaint.color = Colors.brown;         break;
+        case "Io"      : planetPaint.color = Colors.orangeAccent;  break;
+        case "Europa"  : planetPaint.color = Colors.white70;       break;
+        case "Ganymede": planetPaint.color = Colors.grey;          break;
+        case "Callisto": planetPaint.color = Colors.grey.shade600; break;
+        case "Saturn"  : planetPaint.color = Colors.purple;        break;
+        default        : planetPaint.color = Colors.white;
       }
 
       // DESTACAR HOVER
-      if (body == hovered) {
-        planetPaint.color = Colors.white;
-      }
+      if (body == hovered) planetPaint.color = Colors.white;
       // DESTACAR SELECIONADO
-      if (body == selected) {
-        planetPaint.color = Colors.yellow;
-      }
+      if (body == selected) planetPaint.color = Colors.yellow;
 
       // DESENHAR PLANETA
-      canvas.drawCircle(
-        screen,
-        body.radius * camera.zoom,
-        planetPaint,
-      );
+      canvas.drawCircle(screen, body.radius * camera.zoom, planetPaint);
 
+      // Modificações para Saturno com seus anéis
       if (body.name == "Saturn") {
-        // Anéis para saturno
+        print("DESENHANDO SATURNO... $screen");
         final ringPaint = Paint()
           ..color = Colors.brown.withOpacity(0.6)
           ..style = PaintingStyle.stroke
-          ..strokeWidth = 3;
+          ..strokeWidth = 2;
 
-        canvas.drawCircle(
-          screen,
-          body.radius * camera.zoom * 1.8,
+        // Salva o estado atual do canvas
+        canvas.save();
+        // Move o canvas para o centro do planeta
+        canvas.translate(screen.dx, screen.dy);
+        // Rotacionar para inclinar o anel
+        canvas.rotate(-0.5);
+
+        // Desenhar o anel com um oval
+        canvas.drawOval(
+          Rect.fromCenter(
+            center: Offset.zero,
+            width: body.radius * camera.zoom * 5,
+            height: body.radius * camera.zoom * 2,
+          ),
           ringPaint,
         );
+        // Restaura o canvas
+        canvas.restore();
       }
 
       // DESENHAR FILHOS (Luas)
