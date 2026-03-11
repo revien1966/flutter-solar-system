@@ -8,8 +8,15 @@ class SolarSystemPainter extends CustomPainter {
 
   final List<CelestialBody> bodies;
   final Camera camera;
+  final CelestialBody? hovered;
+  final CelestialBody? selected;
 
-  SolarSystemPainter(this.bodies, this.camera);
+  SolarSystemPainter(
+    this.bodies,
+    this.camera,
+    this.hovered,
+    this.selected,
+  );
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -78,6 +85,15 @@ class SolarSystemPainter extends CustomPainter {
           break;
         default:
           planetPaint.color = Colors.white;
+      }
+
+      // DESTACAR HOVER
+      if (body == hovered) {
+        planetPaint.color = Colors.white;
+      }
+      // DESTACAR SELECIONADO
+      if (body == selected) {
+        planetPaint.color = Colors.yellow;
       }
 
       // DESENHAR PLANETA

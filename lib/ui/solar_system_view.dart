@@ -23,7 +23,9 @@ class _SolarSystemViewState extends State<SolarSystemView> {
   late SimulationEngine engine;
   late GameClock clock;
   late Camera camera;
+
   final selection = Selection();
+  CelestialBody? hovered;
 
   @override
   void initState() {
@@ -49,6 +51,47 @@ class _SolarSystemViewState extends State<SolarSystemView> {
     });
   }
 
+  // Encontrar o corpo mais próximo
+  CelestialBody? _findNearestBody(
+    CelestialBody body,
+    Offset pointer,
+    Offset center,
+    double maxDistance,
+  ) {
+    CelestialBody? nearest;
+    double nearestDist = maxDistance;
+
+    final bodyScreen =
+        camera.worldToScreen(Offset(body.position.x, body.position.y)) + center;
+
+    final dist = (pointer - bodyScreen).distance;
+
+    if (dist < nearestDist) {
+      nearestDist = dist;
+      nearest = body;
+    }
+
+    for (final child in body.children) {
+      final candidate =
+          _findNearestBody(child, pointer, center, nearestDist);
+
+      if (candidate != null) {
+        final candidateScreen = camera.worldToScreen(
+                Offset(candidate.position.x, candidate.position.y)) +
+            center;
+
+        final d = (pointer - candidateScreen).distance;
+
+        if (d < nearestDist) {
+          nearestDist = d;
+          nearest = candidate;
+        }
+      }
+    }
+
+    return nearest;
+  }
+
   // Recursivo: verifica se clicou no corpo
   CelestialBody? _hitTest(CelestialBody body, Offset click, Offset center) {
     final bodyScreen = camera.worldToScreen(Offset(body.position.x, body.position.y)) + center;
@@ -64,6 +107,56 @@ class _SolarSystemViewState extends State<SolarSystemView> {
       if (hit != null) return hit;
     }
     return null;
+  }
+
+  //.....
+  void _handleHover(Offset position) {
+
+    final center = Offset(
+      MediaQuery.of(context).size.width / 2,
+      MediaQuery.of(context).size.height / 2,
+    );
+
+    CelestialBody? nearest;
+
+    for (final root in engine.rootBodies) {
+      final candidate =
+          _findNearestBody(root, position, center, 40);
+
+      if (candidate != null) {
+        nearest = candidate;
+      }
+    }
+
+    setState(() {
+      hovered = nearest;
+    });
+
+  }
+
+  //...............
+  void _handleClick(Offset position) {
+
+    final center = Offset(
+      MediaQuery.of(context).size.width / 2,
+      MediaQuery.of(context).size.height / 2,
+    );
+
+    CelestialBody? nearest;
+
+    for (final root in engine.rootBodies) {
+      final candidate =
+          _findNearestBody(root, position, center, 40);
+
+      if (candidate != null) {
+        nearest = candidate;
+      }
+    }
+
+    setState(() {
+      selection.select(nearest);
+    });
+
   }
 
   @override
@@ -85,27 +178,32 @@ class _SolarSystemViewState extends State<SolarSystemView> {
         }
       },
 
-      child: GestureDetector(
+      child: MouseRegion(
+        onHover: (event) {
+          _handleHover(event.localPosition);
+        },
+        child: GestureDetector(
+
         onPanUpdate: (DragUpdateDetails details) {
           setState(() {
             camera.position -= details.delta / camera.zoom;
           });
         },
-        onTapDown: (TapDownDetails details) {
-          final body = engine.rootBodies
-              .map((b) => _hitTest(b, details.localPosition, screenCenter))
-              .firstWhere((b) => b != null, orElse: () => null);
 
-          setState(() {
-            selection.select(body);
-          });
+        //...................................
+        onTapDown: (TapDownDetails details) {
+          _handleClick(details.localPosition);
         },
+
+        //...........
         child: Stack(
           children: [
             CustomPaint(
               painter: SolarSystemPainter(
                 engine.rootBodies,
                 camera,
+                hovered,
+                selection.selected,
               ),
               size: Size.infinite,
             ),
@@ -113,6 +211,7 @@ class _SolarSystemViewState extends State<SolarSystemView> {
           ],
         ),
       ),
+      )
     );
   }
 
