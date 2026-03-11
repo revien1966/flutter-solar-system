@@ -225,7 +225,11 @@ class _SolarSystemViewState extends State<SolarSystemView> {
               ),
               size: Size.infinite,
             ),
-            InfoPanel(body: selection.selected),
+            Positioned(
+              left: 20,
+              bottom: 20,
+              child: InfoPanel(body: selection.selected),
+            ),
           ],
         ),
       ),

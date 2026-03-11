@@ -18,28 +18,40 @@ class InfoPanel extends StatelessWidget {
         margin: const EdgeInsets.all(16),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.black87,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.white24),
+          color: Colors.black.withOpacity(0.75),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: Colors.blueAccent.withOpacity(0.6),
+            width: 1.5,
+          ),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+
             Text(
               body!.name,
               style: const TextStyle(
-                color: Colors.white,
-                fontSize: 18,
+                color: Colors.cyanAccent,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
+
             const SizedBox(height: 8),
-            Text("Raio: ${body!.radius}"),
-            Text("Órbita: ${body!.orbitRadius}"),
-            Text("Velocidade: ${body!.orbitSpeed}"),
+
+            Text("Raio: ${body!.radius}",
+              style: const TextStyle(color: Colors.white)),
+            Text("Órbita: ${body!.orbitRadius}",
+              style: const TextStyle(color: Colors.white)),
+            Text("Velocidade: ${body!.orbitSpeed}",
+              style: const TextStyle(color: Colors.white)),
             if (body!.children.isNotEmpty)
-              Text("Luas: ${body!.children.map((c) => c.name).join(', ')}"),
+               const SizedBox(height:8),
+            if (body!.children.isNotEmpty)
+               Text("Luas: ${body!.children.map((c) => c.name).join(', ')}",
+              style: const TextStyle(color: Colors.yellow)),
           ],
         ),
       ),
