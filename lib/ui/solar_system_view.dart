@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
+import 'dart:math' as math;
 
 import '../core/time/game_clock.dart';
 import '../simulation/selection.dart';
@@ -9,6 +10,7 @@ import '../simulation/simulation_engine.dart';
 import '../simulation/solar_system_data.dart';
 import '../simulation/celestial_body.dart';
 import '../render/camera.dart';
+import '../render/star.dart';
 import '../render/solar_system_painter.dart';
 import 'info_panel.dart';
 
@@ -23,6 +25,7 @@ class _SolarSystemViewState extends State<SolarSystemView> {
   late SimulationEngine engine;
   late GameClock clock;
   late Camera camera;
+  late List<Star> stars;
 
   final selection = Selection();
   CelestialBody? hovered;
@@ -30,6 +33,20 @@ class _SolarSystemViewState extends State<SolarSystemView> {
   @override
   void initState() {
     super.initState();
+
+    final random = math.Random();
+
+    stars = List.generate(800, (_) {
+
+      return Star(
+        position: Offset(
+          random.nextDouble() * 8000 - 4000,
+          random.nextDouble() * 8000 - 4000,
+        ),
+        depth: random.nextDouble(),
+        size: random.nextDouble() * 1.5 + 0.5,
+      );
+    });
 
     final bodies = SolarSystemData.create();
     engine = SimulationEngine(bodies);
@@ -204,6 +221,7 @@ class _SolarSystemViewState extends State<SolarSystemView> {
                 camera,
                 hovered,
                 selection.selected,
+                stars,
               ),
               size: Size.infinite,
             ),

@@ -2,20 +2,24 @@
 
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
+
 import '../simulation/celestial_body.dart';
 import 'camera.dart';
+import 'star.dart';
 
 class SolarSystemPainter extends CustomPainter {
   final List<CelestialBody> bodies;
   final Camera camera;
   final CelestialBody? hovered;
   final CelestialBody? selected;
+  final List<Star> stars;
 
   SolarSystemPainter(
     this.bodies,
     this.camera,
     this.hovered,
     this.selected,
+    this.stars,
   );
 
   @override
@@ -27,15 +31,15 @@ class SolarSystemPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
 
-    final starPaint = Paint()..color = Colors.white;
+    final starPaint = Paint();
 
-    for (int i = 0; i < 200; i++) {
-      final dx = (i * 97) % size.width;
-      final dy = (i * 53) % size.height;
-
+    for (final star in stars) {
+      final world = star.position * star.depth;
+      final screen = camera.worldToScreen(world) + screenCenter;
+      starPaint.color = Colors.white.withOpacity(0.5 + star.depth * 0.5);
       canvas.drawCircle(
-        Offset(dx, dy),
-        1,
+        screen,
+        star.size,
         starPaint,
       );
     }
@@ -96,7 +100,6 @@ class SolarSystemPainter extends CustomPainter {
 
       // Modificações para Saturno com seus anéis
       if (body.name == "Saturn") {
-        print("DESENHANDO SATURNO... $screen");
         final ringPaint = Paint()
           ..color = Colors.brown.withOpacity(0.6)
           ..style = PaintingStyle.stroke
