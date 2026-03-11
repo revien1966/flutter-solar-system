@@ -1,0 +1,119 @@
+// ui/solar_system_view.dart
+
+import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
+
+import '../core/time/game_clock.dart';
+import '../simulation/selection.dart';
+import '../simulation/simulation_engine.dart';
+import '../simulation/solar_system_data.dart';
+import '../simulation/celestial_body.dart';
+import '../render/camera.dart';
+import '../render/solar_system_painter.dart';
+import 'info_panel.dart';
+
+class SolarSystemView extends StatefulWidget {
+  const SolarSystemView({super.key});
+
+  @override
+  State<SolarSystemView> createState() => _SolarSystemViewState();
+}
+
+class _SolarSystemViewState extends State<SolarSystemView> {
+  late SimulationEngine engine;
+  late GameClock clock;
+  late Camera camera;
+  final selection = Selection();
+
+  @override
+  void initState() {
+    super.initState();
+
+    final bodies = SolarSystemData.create();
+    engine = SimulationEngine(bodies);
+    camera = Camera();
+
+    clock = GameClock();
+    clock.start((dt) {
+      engine.update(dt);
+
+      // Atualiza a câmera se houver seleção para foco
+      // Foco suave da câmera no corpo selecionado
+      if (selection.selected != null) {
+        final target = selection.selected!;
+        final targetScreen = Offset(target.position.x, target.position.y);
+        camera.position += (targetScreen - camera.position) * 0.02; // mais lento
+      }
+
+      setState(() {});
+    });
+  }
+
+  // Recursivo: verifica se clicou no corpo
+  CelestialBody? _hitTest(CelestialBody body, Offset click, Offset center) {
+    final bodyScreen = camera.worldToScreen(Offset(body.position.x, body.position.y)) + center;
+
+    // Raio clicável maior que o raio real
+    final clickableRadius = body.radius * camera.zoom + 8; // +8 pixels de tolerância
+    if ((click - bodyScreen).distance <= clickableRadius) {
+      return body;
+    }
+
+    for (final child in body.children) {
+      final hit = _hitTest(child, click, center);
+      if (hit != null) return hit;
+    }
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final screenCenter = Offset(MediaQuery.of(context).size.width / 2, MediaQuery.of(context).size.height / 2);
+
+    return Listener(
+      onPointerSignal: (event) {
+        if (event is PointerScrollEvent) {
+          setState(() {
+            const zoomFactor = 1.05; // mais suave
+            if (event.scrollDelta.dy > 0) {
+              camera.zoom /= zoomFactor;
+            } else {
+              camera.zoom *= zoomFactor;
+            }
+            camera.zoom = camera.zoom.clamp(0.1, 20.0);
+          });
+        }
+      },
+
+      child: GestureDetector(
+        onPanUpdate: (DragUpdateDetails details) {
+          setState(() {
+            camera.position -= details.delta / camera.zoom;
+          });
+        },
+        onTapDown: (TapDownDetails details) {
+          final body = engine.rootBodies
+              .map((b) => _hitTest(b, details.localPosition, screenCenter))
+              .firstWhere((b) => b != null, orElse: () => null);
+
+          setState(() {
+            selection.select(body);
+          });
+        },
+        child: Stack(
+          children: [
+            CustomPaint(
+              painter: SolarSystemPainter(
+                engine.rootBodies,
+                camera,
+              ),
+              size: Size.infinite,
+            ),
+            InfoPanel(body: selection.selected),
+          ],
+        ),
+      ),
+    );
+  }
+
+}

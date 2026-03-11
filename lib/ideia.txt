@@ -1,0 +1,33 @@
+SEPARAÇÃO CLARA:
+================
+............................................
+camada                      responsabilidade
+-----------------------------------------------
+core                        matemática e tempo
+simulation                  física e órbitas
+render                      desenhar
+interaction                 gestos e seleção
+ui                          widgets
+
+.....................................................
+AQUI É O CORAÇÃO DO SISTEMA:
+============================
+SimulationEngine
+     ↓
+Atualiza ângulos orbitais
+     ↓
+Atualiza posições
+     ↓
+Notifica renderização
+
+
+...........................
+Ticker:
+===========
+Ticker
+   ↓
+deltaTime
+   ↓
+simulation.update()
+   ↓
+repaint()
